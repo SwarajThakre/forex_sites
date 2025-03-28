@@ -12,10 +12,8 @@ let baseCurrency = 'EUR';
 // Initialize the app based on the current page
 document.addEventListener('DOMContentLoaded', function () {
   if (document.getElementById('currency-table')) {
-    // Index page (all rates)
     initIndexPage();
   } else if (document.getElementById('from-currency')) {
-    // Converter page
     initConverterPage();
   }
 });
@@ -25,10 +23,8 @@ function initIndexPage() {
   const searchInput = document.getElementById('search-input');
   const refreshBtn = document.getElementById('refresh-btn');
 
-  // Fetch data and display
   fetchExchangeRates();
 
-  // Set up event listeners
   searchInput.addEventListener('input', filterCurrencyTable);
   refreshBtn.addEventListener('click', fetchExchangeRates);
 }
@@ -46,7 +42,6 @@ function initConverterPage() {
     populateCurrencySelects(fromCurrencySelect, toCurrencySelect);
   });
 
-  // Set up event listeners
   amountInput.addEventListener('input', performConversion);
   fromCurrencySelect.addEventListener('change', performConversion);
   toCurrencySelect.addEventListener('change', performConversion);
@@ -54,8 +49,6 @@ function initConverterPage() {
   swapBtn.addEventListener('click', swapCurrencies);
 }
 
-// Fetch exchange rates from API
-// Fetch exchange rates from API
 async function fetchExchangeRates() {
   showLoading();
   hideError();
@@ -73,23 +66,16 @@ async function fetchExchangeRates() {
     const inrRate = originalRates['INR'];
     const usdRate = originalRates['USD'];
 
-    // Convert all rates to show how many INR = 1 unit of foreign currency
     exchangeRates = {};
     for (const [currency, rate] of Object.entries(originalRates)) {
-      // This gives us how many INR = 1 unit of foreign currency
       exchangeRates[currency] = inrRate / rate;
     }
 
-    // Special cases
-    exchangeRates['EUR'] = inrRate; // 1 EUR = X INR
-    exchangeRates['INR'] = 1; // 1 INR = 1 INR
+    exchangeRates['EUR'] = inrRate;
+    exchangeRates['INR'] = 1;
 
     baseCurrency = 'INR';
-
-    // Now USD rate will show how many INR = 1 USD
-    // For example: if 1 EUR = 92 INR and 1 EUR = 1.08 USD
-    // Then 1 USD = 92/1.08 ≈ 85.19 INR
-    console.log('1 USD =', exchangeRates['USD'], 'INR'); // Should show ≈85.19
+    console.log('1 USD =', exchangeRates['USD'], 'INR');
 
     // Update UI
     const date = new Date(data.timestamp * 1000);
@@ -120,11 +106,8 @@ async function fetchCurrencyNames() {
     currencies = await response.json();
   } catch (error) {
     console.error('Failed to fetch currency names:', error);
-    // If we can't get the full names, we'll just use the codes
   }
 }
-
-// Update the currency table on index page
 function updateCurrencyTable() {
   const tableBody = document.getElementById('currency-table');
   tableBody.innerHTML = '';
@@ -149,7 +132,6 @@ function updateCurrencyTable() {
     row.appendChild(nameCell);
 
     const rateCell = document.createElement('td');
-    // Show "1 [currency] = X INR" format
     rateCell.textContent = `1 ${currency.code} = ${currency.rate.toFixed(
       6
     )} INR`;
@@ -197,11 +179,9 @@ function populateCurrencySelects(fromSelect, toSelect) {
     toSelect.appendChild(option2);
   });
 
-  // Set default values (INR to USD)
   fromSelect.value = 'INR';
   toSelect.value = 'USD';
 
-  // Perform initial conversion
   performConversion();
 }
 
@@ -215,8 +195,8 @@ function performConversion() {
 
   if (!fromCurrency || !toCurrency) return;
 
-  const fromRate = exchangeRates[fromCurrency]; // INR per fromCurrency
-  const toRate = exchangeRates[toCurrency]; // INR per toCurrency
+  const fromRate = exchangeRates[fromCurrency];
+  const toRate = exchangeRates[toCurrency];
 
   if (!fromRate || !toRate) {
     resultElement.textContent = 'Error: Invalid currency selection';
